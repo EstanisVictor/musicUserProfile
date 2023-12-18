@@ -1,15 +1,16 @@
 import os
 
 from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
+import clusteringAnalyzer
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
 
 UPLOAD_FOLDER = "uploads"
-
-if not os.path.isdir(UPLOAD_FOLDER):
-    os.mkdir(UPLOAD_FOLDER)
+#
+# if not os.path.isdir(UPLOAD_FOLDER):
+#     os.mkdir(UPLOAD_FOLDER)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 IMAGE_FOLDER = os.path.join(current_dir, 'images')
@@ -20,9 +21,9 @@ app.config['IMAGE_FOLDER'] = IMAGE_FOLDER
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
-
+@cross_origin(origin='http://localhost:3000', headers=['Content-Type', 'Authorization'])
 @app.route('/upload', methods=['POST'])
-def upload_file():
+def process_file():
     if 'file' not in request.files:
         return jsonify({'error': 'Nenhum arquivo enviado'})
 
@@ -31,11 +32,20 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'Nome de arquivo vazio'})
 
-    if file:
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-        return jsonify({'message': 'Arquivo enviado com sucesso'})
+    if file and file.filename.endswith('.csv'):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        file.save(file_path)
 
-    return jsonify({'error': 'Erro ao processar o arquivo'})
+        # Instanciando e utilizando a classe ClusteringAnalyzer
+        clustering_analyzer = clusteringAnalyzer.ClusteringAnalyzer(file_path)
+        clustering_analyzer.load_data()
+        clustering_analyzer.apply_clustering()
+        clustering_analyzer.generate_plots()
+        clustering_analyzer.save_cluster_descriptions()
+
+        return jsonify({'message': 'Arquivo processado com sucesso'})
+
+    return jsonify({'error': 'Formato de arquivo inválido'})
 
 
 @app.route('/get-image/<image_name>', methods=['GET'])
