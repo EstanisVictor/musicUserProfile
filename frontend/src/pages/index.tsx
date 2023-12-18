@@ -44,12 +44,12 @@ export default function Home() {
       >
         <h1 className="text-center capitalize text-3xl">Bem Vindo</h1>
         <label className="flex flex-col">
-          <span className="ml-1">Adicione uma base de dados do tipo txt</span>
+          <span className="ml-1">Adicione uma base de dados do tipo csv</span>
           <input
             className="p-2 rounded-md border-gray-400 border-solid border-2 enabled:hover:border-blue-500 focus:border-blue-700 outline-none"
             type="file"
             multiple
-            accept=".txt"
+            accept=".csv"
             {...register("file")}
           />
           {errors.file && (
