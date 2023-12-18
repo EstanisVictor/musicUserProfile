@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Router from "next/router";
+import { uploadFile } from "@/Services";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +31,7 @@ export default function Home() {
 
   const handleSubmitForm = handleSubmit(async (data: Data) => {
     console.log(data);
+    await uploadFile(data);
     Router.push("/dashboard");
   });
 
