@@ -1,7 +1,7 @@
 import { IuserprofileMusic } from "@/Interfaces";
 import path from "path";
 
-export function uploadFile(userProfileMusic: IuserprofileMusic) {
+export async function uploadFile(userProfileMusic: IuserprofileMusic) {
   const formdarta = new FormData();
   formdarta.append("file", userProfileMusic.file[0]);
 

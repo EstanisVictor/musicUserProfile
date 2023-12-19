@@ -31,7 +31,9 @@ export default function Home() {
 
   const handleSubmitForm = handleSubmit(async (data: Data) => {
     console.log(data);
+    
     await uploadFile(data);
+
     Router.push("/dashboard");
   });
 
