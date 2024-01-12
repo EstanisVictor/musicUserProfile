@@ -2,12 +2,12 @@ import { downloadImage, downloadImageByName } from "@/Services";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-    const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   useEffect(() => {
     async function fetchImages() {
       const imageNames = await downloadImageByName();
-      
+
       // Para cada nome de imagem, baixe a imagem e atualize o estado
       const urls = await Promise.all(imageNames.map(downloadImage));
       setImageUrls(urls);
@@ -16,7 +16,6 @@ export default function Dashboard() {
     // Inicie a busca de imagens
     fetchImages();
   }, []);
-
 
   return (
     <>
