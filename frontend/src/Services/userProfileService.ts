@@ -1,4 +1,4 @@
-import { IuserprofileMusic } from "@/Interfaces";
+import { IuserprofileMusic, Estatisticas, Dados } from "@/Interfaces";
 import path from "path";
 
 export async function uploadFile(userProfileMusic: IuserprofileMusic) {
@@ -54,4 +54,43 @@ export async function downloadImage(imageName: string) {
         console.error("Erro ao buscar imagens:", error);
         return "";
     }
+}
+
+export async function getAllDescriptions(): Promise<any> {
+  try {
+    const response = await fetch("http://localhost:5000/get-all-descriptions");
+    if (!response.ok) {
+      throw new Error("Erro ao buscar descrições");
+    }
+
+    const data = await response.json();
+    const descriptions: Dados[] = data.descriptions || [];
+
+    const descriptionsComEstatisticas: Dados[] = descriptions.map(descricao => {
+      return {
+        ...descricao,
+        Estatisticas_Horas_Ouvidas: associateWithEstatisticas(descricao.Estatisticas_Horas_Ouvidas),
+      };
+    });
+
+    console.log("Descrições dos clusters:", descriptionsComEstatisticas);
+    return descriptionsComEstatisticas;
+  } catch (error) {
+    console.error("Erro ao buscar descrições:", error);
+    return [];
+  }
+}
+
+function associateWithEstatisticas(estatisticasData: any): Estatisticas {
+  const estatisticas: Estatisticas = {
+    mean: { ...estatisticasData.mean },
+    std: { ...estatisticasData.std },
+    min: { ...estatisticasData.min },
+    '25%': { ...estatisticasData['25%'] },
+    '50%': { ...estatisticasData['50%'] },
+    '75%': { ...estatisticasData['75%'] },
+    max: { ...estatisticasData.max },
+  };
+
+  return estatisticas;
 }
